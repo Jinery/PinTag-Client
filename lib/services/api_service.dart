@@ -103,8 +103,24 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> removeItem(int userId, int itemId) async {
+  Future<Map<String, dynamic>> moveItem(int userId, int itemId, int newBoardId) async {
     final response = await http.post(
+      Uri.parse("$baseUrl/users/$userId/items/$itemId"),
+      headers: _headers,
+      body: jsonEncode({
+        "new_board_id": newBoardId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Ошибка при перемещении элемента: ${response.statusCode}");
+    }
+  }
+
+  Future<Map<String, dynamic>> removeItem(int userId, int itemId) async {
+    final response = await http.delete(
       Uri.parse("$baseUrl/users/$userId/items/$itemId"),
       headers: _headers,
     );

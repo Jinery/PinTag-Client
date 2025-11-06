@@ -76,10 +76,14 @@ class _BoardsScreen extends State<BoardsScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16.0),
               child: InkWell(
-                onTap: () => Navigator.push(
+                onTap: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => ItemsScreen(userId: widget.userId, board: board)),
-                ),
+                  );
+
+                  _loadBoards();
+                },
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

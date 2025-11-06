@@ -6,11 +6,15 @@ import '../models/item.dart';
 class ItemCard extends StatelessWidget {
   final Item item;
   final VoidCallback onTap;
+  final VoidCallback onRemoveTap;
+  final VoidCallback onMoveTap;
 
   const ItemCard({
     Key? key,
     required this.item,
     required this.onTap,
+    required this.onRemoveTap,
+    required this.onMoveTap,
 }) : super(key: key);
 
   @override
@@ -29,6 +33,20 @@ class ItemCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 5),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                        onPressed: onRemoveTap,
+                        icon: const Icon(Icons.delete, color: Colors.red,)
+                    ),
+                    const SizedBox(width: 2),
+                    IconButton(
+                        onPressed: onMoveTap,
+                        icon: const Icon(Icons.drive_file_move, color: Colors.grey)
+                    ),
+                  ],
+                ),
                 Text(
                   item.title,
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),

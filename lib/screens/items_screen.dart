@@ -1,10 +1,8 @@
-
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_tag_client/models/item.dart';
 import 'package:pin_tag_client/services/api_service.dart';
 import 'package:pin_tag_client/widgets/item_card.dart';
+import 'package:pin_tag_client/widgets/move_item_dialog.dart';
 
 import '../models/board.dart';
 
@@ -21,7 +19,7 @@ class ItemsScreen extends StatefulWidget {
 class _ItemsScreen extends State<ItemsScreen> {
   final ApiService _apiService = ApiService();
   List<Item> _items = List.empty();
-  bool _isLoading = false;
+  bool _isLoading = true;
 
 
   @override
@@ -73,12 +71,46 @@ class _ItemsScreen extends State<ItemsScreen> {
         itemBuilder: (context, index) {
           final item = _items[index];
           return ItemCard(
-              item: item,
-              onTap: () => print("Tapped on ${item.title}")
+            item: item,
+            onTap: () => print("Tapped on ${item.title}"),
+            onRemoveTap: () => _removeItem(item),
+            onMoveTap: () => _moveItem(item),
           );
         },
       ),
     );
   }
 
+  Future<void> _removeItem(Item item) async {
+    try {
+      final response = await _apiService.removeItem(widget.userId, item.id);
+      setState(() async {
+        await _loadItemsForBoard();
+      });
+    } on Exception catch (ex) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ошибка удаления: $ex")),
+      );
+    }
+  }
+
+  Future<void> _moveItem(Item item) async {
+    showDialog(
+        context: context,
+        builder: (context) => MoveItemDialog(
+            userId: widget.userId,
+            itemId: item.id,
+            currentBoardId: widget.board.id,
+            itemTitle: item.title,
+            onMove: (newBoardId) async {
+              await _apiService.moveItem(widget.userId, item.id, newBoardId);
+            },
+            onSuccess: () {
+              setState(() {
+                _loadItemsForBoard();
+              });
+            },
+        ),
+    );
+  }
 }
