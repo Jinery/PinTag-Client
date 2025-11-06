@@ -30,7 +30,6 @@ class MyApp extends StatelessWidget {
           final authData = snapshot.data as Map<String, dynamic>?;
           if (authData != null) {
             final apiService = ApiService();
-            apiService.setConnectId(authData['connectId']);
 
             return BoardsScreen(userId: authData['userId']);
           } else {

@@ -48,7 +48,6 @@ class _AuthScreen extends State<AuthScreen> {
 
       if(isApproved) {
         await _storageService.saveUserData(userId, connectId);
-        _apiService.setConnectId(connectId);
         
         Navigator.pushReplacement(
             context,

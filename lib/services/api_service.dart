@@ -1,19 +1,18 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:pin_tag_client/services/storage_service.dart';
 
 import '../models/board.dart';
 import '../models/item.dart';
 
 class ApiService {
   static const String baseUrl = "http://localhost:8000";
-  String? connectId;
+  
+  static Future<Map<String, String>> getHeaders() async {
+    final storage = StorageService();
+    final connectId = await storage.getConnectId();
 
-  void setConnectId(String connectId) {
-    this.connectId = connectId;
-  }
-
-  Map<String, String> get _headers {
     return {
       "X-Auth-Token": connectId ?? "pending",
       "Content-Type": "application/json",
@@ -23,7 +22,7 @@ class ApiService {
   Future<Map<String, dynamic>> generateConnect(int userId, String clientName) async {
     final response = await http.post(
       Uri.parse("$baseUrl/users/$userId/generate-connect"),
-      headers: _headers,
+      headers: await getHeaders(),
       body: json.encode({"client_name": clientName}),
     );
 
@@ -37,7 +36,7 @@ class ApiService {
   Future<Map<String, dynamic>> getConnectionStatus(String connectId, int userId) async {
     final response = await http.get(
       Uri.parse("$baseUrl/connections/$connectId/status?user_id=$userId"),
-      headers: _headers,
+      headers: await getHeaders(),
     );
 
     if(response.statusCode == 200) {
@@ -50,7 +49,7 @@ class ApiService {
   Future<List<Board>> getBoards(int userId) async {
     final response = await http.get(
       Uri.parse("$baseUrl/users/$userId/boards"),
-      headers: _headers,
+      headers: await getHeaders(),
     );
 
     if(response.statusCode == 200) {
@@ -64,7 +63,7 @@ class ApiService {
   Future<List<Item>> getBoardItems(int userId, int boardId) async {
     final response = await http.get(
       Uri.parse("$baseUrl/users/$userId/boards/$boardId/items"),
-      headers: _headers,
+      headers: await getHeaders(),
     );
 
     if(response.statusCode == 200) {
@@ -78,7 +77,7 @@ class ApiService {
   Future<List<Item>> searchItems(int userId, String query) async {
     final response = await http.get(
       Uri.parse("$baseUrl/users/$userId/search?q=$query"),
-      headers: _headers,
+      headers: await getHeaders(),
     );
 
     if(response.statusCode == 200) {
@@ -92,7 +91,7 @@ class ApiService {
   Future<Map<String, dynamic>> createItem(int userId, Map<String, dynamic> itemData) async {
     final response = await http.post(
       Uri.parse("$baseUrl/users/$userId/items"),
-      headers: _headers,
+      headers: await getHeaders(),
       body: jsonEncode(itemData),
     );
 
@@ -106,7 +105,7 @@ class ApiService {
   Future<Map<String, dynamic>> moveItem(int userId, int itemId, int newBoardId) async {
     final response = await http.post(
       Uri.parse("$baseUrl/users/$userId/items/$itemId"),
-      headers: _headers,
+      headers: await getHeaders(),
       body: jsonEncode({
         "new_board_id": newBoardId,
       }),
@@ -122,7 +121,7 @@ class ApiService {
   Future<Map<String, dynamic>> removeItem(int userId, int itemId) async {
     final response = await http.delete(
       Uri.parse("$baseUrl/users/$userId/items/$itemId"),
-      headers: _headers,
+      headers: await getHeaders(),
     );
 
     if(response.statusCode == 200) {
