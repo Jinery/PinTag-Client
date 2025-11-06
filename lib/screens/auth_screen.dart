@@ -21,6 +21,14 @@ class _AuthScreen extends State<AuthScreen> {
   String _status = '';
 
   Future<void> _connectToAccount() async {
+    if(_userIdController.text.isEmpty) {
+      setState(() {
+        _status = "Введи Id своего телеграмм-аккаунта.";
+        _isLoading = false;
+      });
+      return;
+    }
+
     setState(() {
       _isLoading = true;
       _status = "Подключение...";
@@ -94,14 +102,38 @@ class _AuthScreen extends State<AuthScreen> {
               decoration: InputDecoration(
                 labelText: 'ID пользователя',
                 hintText: 'Введи свой Telegram ID',
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.black54,
+                    width: 1.5,
+                    style: BorderStyle.solid
+                  ),
+                ),
+                enabledBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                  color: Colors.black54,
+                    width: 1.5,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                focusedBorder: const OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.blue,
+                    width: 2.5,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                labelStyle: TextStyle(
+                  color: Colors.black54,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             SizedBox(height: 20),
             if(_isLoading) CircularProgressIndicator(),
             if(_status.isNotEmpty)
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Text(
                   _status,
                   textAlign: TextAlign.center,
@@ -109,7 +141,18 @@ class _AuthScreen extends State<AuthScreen> {
               ),
             ElevatedButton(
                 onPressed: _isLoading ? null : _connectToAccount,
-                child: Text("Подключиться"),
+                child: Text("Подключиться",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
+                  shadowColor: Colors.blue.withValues(alpha: 0.7),
+                  elevation: 3.0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.0)),
+                  minimumSize: Size(160, 50)
+                ),
             ),
           ],
         ),

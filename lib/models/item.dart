@@ -1,7 +1,9 @@
+import "content_type.dart";
+
 class Item {
   final int id;
   final String title;
-  final String contentType;
+  final ContentType contentType;
   final String? contentData;
   final String createdAt;
   final String boardName;
@@ -21,11 +23,11 @@ class Item {
     return Item(
       id: json['id'],
       title: json['title'],
-      contentType: json['content_type'],
+      contentType: ContentType.fromString(json['content_type']),
       contentData: json['content_data'],
       createdAt: json['created_at'],
       boardName: json['board_name'],
-      boardEmoji: json['board_emoji']
+      boardEmoji: json['board_emoji'],
     );
   }
 }
