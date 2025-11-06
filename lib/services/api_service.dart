@@ -34,9 +34,9 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> getConnectionStatus(String connectId) async {
+  Future<Map<String, dynamic>> getConnectionStatus(String connectId, int userId) async {
     final response = await http.get(
-      Uri.parse("$baseUrl/connections/$connectId/status"),
+      Uri.parse("$baseUrl/connections/$connectId/status?user_id=$userId"),
       headers: _headers,
     );
 

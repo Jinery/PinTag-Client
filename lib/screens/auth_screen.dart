@@ -1,6 +1,7 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:pin_tag_client/screens/board_screen.dart';
 
 import '../services/api_service.dart';
 import '../services/storage_service.dart';
@@ -35,13 +36,16 @@ class _AuthScreen extends State<AuthScreen> {
         _status = "Запрос отправлен, ожидаю подтверждения...";
       });
 
-      bool isApproved = await _waitForApproval(connectId);
+      bool isApproved = await _waitForApproval(connectId, userId);
 
       if(isApproved) {
         await _storageService.saveUserData(userId, connectId);
         _apiService.setConnectId(connectId);
         
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => BoardsScreen(userId: userId)),
+        );
       } else {
         setState(() {
           _status = "Подключение отклонено";
@@ -56,12 +60,12 @@ class _AuthScreen extends State<AuthScreen> {
     }
   }
 
-  Future<bool> _waitForApproval(String connectId) async {
+  Future<bool> _waitForApproval(String connectId, int userId) async {
     for (int i = 0; i < 100; i++) {
       await Future.delayed(Duration(seconds: 3));
 
       try {
-        final status = await _apiService.getConnectionStatus(connectId);
+        final status = await _apiService.getConnectionStatus(connectId, userId);
 
         if (status['status'] == 'accepted') {
           return true;
