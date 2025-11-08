@@ -5,6 +5,7 @@ class Item {
   final String title;
   final ContentType contentType;
   final String? contentData;
+  final String? filePath;
   final String createdAt;
   final String boardName;
   final String boardEmoji;
@@ -13,6 +14,7 @@ class Item {
     required this.id,
     required this.title,
     required this.contentType,
+    this.filePath,
     this.contentData,
     required this.createdAt,
     required this.boardName,
@@ -25,6 +27,7 @@ class Item {
       title: json['title'],
       contentType: ContentType.fromString(json['content_type']),
       contentData: json['content_data'],
+      filePath: json['file_path'],
       createdAt: json['created_at'],
       boardName: json['board_name'],
       boardEmoji: json['board_emoji'],

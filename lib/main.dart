@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:pin_tag_client/screens/auth_screen.dart';
 import 'package:pin_tag_client/screens/board_screen.dart';
 import 'package:pin_tag_client/services/api_service.dart';
 import 'package:pin_tag_client/services/storage_service.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  MediaKit.ensureInitialized();
   runApp(const MyApp());
 }
 

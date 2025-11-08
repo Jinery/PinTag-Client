@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pin_tag_client/models/item.dart';
 import 'package:pin_tag_client/services/api_service.dart';
+import 'package:pin_tag_client/widgets/create_item_dialog.dart';
 import 'package:pin_tag_client/widgets/item_card.dart';
 import 'package:pin_tag_client/widgets/move_item_dialog.dart';
 
@@ -51,6 +52,12 @@ class _ItemsScreen extends State<ItemsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Элементы для доски ${widget.board.name} ${widget.board.emoji} "),
+        actions: [
+          IconButton(
+              onPressed: () => _showCreateItemDialog(),
+              icon: const Icon(Icons.add)
+          ),
+        ],
       ),
       body: _isLoading ? Center(
         child: CircularProgressIndicator(),
@@ -72,6 +79,7 @@ class _ItemsScreen extends State<ItemsScreen> {
           final item = _items[index];
           return ItemCard(
             item: item,
+            userId: widget.userId,
             onTap: () => print("Tapped on ${item.title}"),
             onRemoveTap: () => _removeItem(item),
             onMoveTap: () => _moveItem(item),
@@ -110,6 +118,17 @@ class _ItemsScreen extends State<ItemsScreen> {
                 _loadItemsForBoard();
               });
             },
+        ),
+    );
+  }
+
+  Future<void> _showCreateItemDialog() async {
+    showDialog(
+        context: context,
+        builder: (context) => CreateItemDialog(
+            userId: widget.userId,
+            boardId: widget.board.id,
+            onItemCreated: () => _loadItemsForBoard()
         ),
     );
   }

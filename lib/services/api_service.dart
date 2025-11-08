@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:pin_tag_client/services/storage_service.dart';
@@ -9,14 +10,19 @@ import '../models/item.dart';
 class ApiService {
   static const String baseUrl = "http://localhost:8000";
   
-  static Future<Map<String, String>> getHeaders() async {
+  static Future<Map<String, String>> getHeaders({bool isMultipart = false}) async {
     final storage = StorageService();
     final connectId = await storage.getConnectId();
 
-    return {
+    final Map<String, String> headers = {
       "X-Auth-Token": connectId ?? "pending",
-      "Content-Type": "application/json",
     };
+
+    if(!isMultipart) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    return headers;
   }
 
   Future<Map<String, dynamic>> generateConnect(int userId, String clientName) async {
@@ -99,6 +105,27 @@ class ApiService {
       return jsonDecode(response.body);
     } else {
       throw Exception("Ошибка при создании элемента\nКод: ${response.statusCode}");
+    }
+  }
+
+  Future<Map<String, dynamic>> uploadFile(int userId, Map<String, dynamic> itemData, File file) async {
+    final request = http.MultipartRequest("POST", Uri.parse("$baseUrl/users/$userId/items/upload"));
+    request.headers.addAll(await getHeaders(isMultipart: true));
+    itemData.forEach((key, value) {
+      request.fields[key] = value.toString();
+    });
+    
+    request.files.add(
+      await http.MultipartFile.fromPath("file", file.path),
+    );
+
+    final streamedResponse = await request.send();
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if(response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Ошибка при загрузке файла\nКод: ${response.statusCode}");
     }
   }
 

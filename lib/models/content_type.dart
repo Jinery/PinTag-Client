@@ -23,4 +23,14 @@ extension ContentTypeExtension on ContentType {
       ContentType.unknown => 'Неизвестный тип',
     };
   }
+
+  String get toContentString {
+    return switch (this) {
+      ContentType.link => 'link',
+      ContentType.photo => 'photo',
+      ContentType.document => 'document',
+      ContentType.video => 'video',
+      ContentType.unknown => 'unknown',
+    };
+  }
 }
