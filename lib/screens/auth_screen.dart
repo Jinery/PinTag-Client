@@ -129,7 +129,7 @@ class _AuthScreen extends State<AuthScreen> {
               ),
             ),
             SizedBox(height: 20),
-            if(_isLoading) CircularProgressIndicator(),
+            if(_isLoading) CircularProgressIndicator(strokeWidth: 2, color: Colors.blue[700], strokeCap: StrokeCap.round),
             if(_status.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),

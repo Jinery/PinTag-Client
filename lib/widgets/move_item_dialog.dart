@@ -104,7 +104,8 @@ class _MoveItemDialogState extends State<MoveItemDialog> {
               const SizedBox(height: 8),
               Text(
                 "'${widget.itemTitle}'",
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                style: TextStyle(
+                  fontSize: 16,
                   color: Colors.grey[600],
                 ),
                 textAlign: TextAlign.center,
@@ -195,7 +196,7 @@ class _MoveItemDialogState extends State<MoveItemDialog> {
                       style: FilledButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: Colors.green.withValues(alpha: 0.8),
-                        shadowColor: Colors.blue.withValues(alpha: 0.7),
+                        shadowColor: Colors.green.withValues(alpha: 0.7),
                         elevation: 1.0,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.0)),
                       ),

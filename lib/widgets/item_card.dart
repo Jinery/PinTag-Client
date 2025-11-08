@@ -85,15 +85,17 @@ class ItemCard extends StatelessWidget {
       return _buildPlaceholderText("Ссылка не указана");
     }
 
-    return Text(
-      item.contentData!,
-      style: const TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Colors.blue,
+    return Center(
+      child: Text(
+        item.contentData!,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.blue,
+        ),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
       ),
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
     );
   }
 

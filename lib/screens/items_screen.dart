@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:pin_tag_client/models/content_type.dart';
 import 'package:pin_tag_client/models/item.dart';
 import 'package:pin_tag_client/services/api_service.dart';
 import 'package:pin_tag_client/widgets/create_item_dialog.dart';
 import 'package:pin_tag_client/widgets/item_card.dart';
 import 'package:pin_tag_client/widgets/move_item_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/board.dart';
 
@@ -60,7 +62,7 @@ class _ItemsScreen extends State<ItemsScreen> {
         ],
       ),
       body: _isLoading ? Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.blue[700], strokeCap: StrokeCap.round),
       ) : _items.isEmpty ? Center(
         child: Text(
           "Элементы для доски ${widget.board.name} ${widget.board.emoji} отсутствуют",
@@ -80,7 +82,11 @@ class _ItemsScreen extends State<ItemsScreen> {
           return ItemCard(
             item: item,
             userId: widget.userId,
-            onTap: () => print("Tapped on ${item.title}"),
+            onTap: () {
+              if(item.contentType == ContentType.link && item.contentData != null && item.contentData!.isNotEmpty) {
+                launchUrl(Uri.parse(item.contentData!));
+              }
+            },
             onRemoveTap: () => _removeItem(item),
             onMoveTap: () => _moveItem(item),
           );

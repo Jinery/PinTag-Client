@@ -149,8 +149,6 @@ class _CreateItemDialog extends State<CreateItemDialog> {
     };
   }
 
-  bool get _showTextField => _selectedType == ContentType.link || (_selectedFile == null && _contentController.text.isNotEmpty);
-
   bool get _showFileControls =>
       _selectedType == ContentType.photo ||
       _selectedType == ContentType.video ||
@@ -191,12 +189,20 @@ class _CreateItemDialog extends State<CreateItemDialog> {
                   controller: _titleController,
                   decoration: InputDecoration(
                     labelText: "Название элемента",
+                    floatingLabelStyle: TextStyle(color: Colors.blue, fontSize: 18),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Colors.blue, width: 1.5),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(width: 1.0),
                     ),
                     filled: true,
                     fillColor: Colors.grey[50],
                   ),
+                  cursorColor: Colors.blue,
+                  cursorWidth: 0.7,
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return "Введи название";
@@ -212,7 +218,7 @@ class _CreateItemDialog extends State<CreateItemDialog> {
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey[300]!),
+                    border: Border.all(color: Colors.black87),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: DropdownButton<ContentType>(
@@ -227,6 +233,7 @@ class _CreateItemDialog extends State<CreateItemDialog> {
                         });
                       }
                     },
+                    borderRadius: BorderRadius.circular(8),
                     items: ContentType.values
                         .where((type) => type != ContentType.unknown)
                         .map((type) {
@@ -237,20 +244,29 @@ class _CreateItemDialog extends State<CreateItemDialog> {
                     }).toList(),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 if (_selectedType == ContentType.link)
                   TextFormField(
                     controller: _contentController,
-                    maxLines: _selectedType == ContentType.document ? 4 : 2,
+                    maxLines: 2,
                     decoration: InputDecoration(
                       labelText: _selectedType.displayName,
                       hintText: _getContentHint(),
+                      hintStyle: TextStyle(color: Colors.grey[700], fontSize: 18),
+                      floatingLabelStyle: TextStyle(color: Colors.black87, fontSize: 20),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.black87, width: 1.3),
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(width: 1.0),
                       ),
                       filled: true,
                       fillColor: Colors.grey[50],
                     ),
+                    cursorWidth: 0.8,
+                    cursorColor: Colors.black54,
                     validator: (value) {
                       if (_selectedType == ContentType.link || _selectedFile == null) {
                         if (value == null || value.trim().isEmpty) {
@@ -268,24 +284,39 @@ class _CreateItemDialog extends State<CreateItemDialog> {
                   )
                 else if (_showFileControls)
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(_getContentHint()),
+                      Text(_getContentHint(), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0)),
                       const SizedBox(height: 8),
-                      OutlinedButton.icon(
-                        icon: const Icon(Icons.upload_file),
-                        label: Text(
-                            _selectedFile != null ? "Изменить файл" : "Выбрать файл",
-                            textAlign: TextAlign.center
+                      Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: FittedBox(
+                          fit: BoxFit.contain,
+                          child: OutlinedButton.icon(
+                            icon: const Icon(Icons.upload_file),
+                            label: Text(
+                                _selectedFile != null ? "Изменить файл" : "Выбрать файл",
+                                textAlign: TextAlign.center
+                            ),
+                            onPressed: _pickFile,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Colors.blue.withValues(alpha: 0.8),
+                              shadowColor: Colors.blue,
+                              elevation: 1.0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7.0)),
+                              maximumSize: Size(600, 400),
+                              minimumSize: Size(250, 70)
+                            ),
+                          ),
                         ),
-                        onPressed: _pickFile,
                       ),
                       if (_selectedFile != null)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
                             'Файл: ${_selectedFile!.name}',
-                            style: Theme.of(context).textTheme.bodySmall,
+                            style: TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.bold),
                           ),
                         ),
                     ],
@@ -294,9 +325,16 @@ class _CreateItemDialog extends State<CreateItemDialog> {
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
+                      child: FilledButton(
                         onPressed: _isLoading ? null : () => Navigator.of(context).pop(),
                         child: const Text("Отмена"),
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.red[600],
+                          elevation: 2.0,
+                          shadowColor: Colors.red[800],
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -306,12 +344,19 @@ class _CreateItemDialog extends State<CreateItemDialog> {
                             ? null
                             : _submit,
                         child: _isLoading
-                            ? const SizedBox(
+                            ? SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.blue[700], strokeCap: StrokeCap.round),
                         )
                             : const Text("Создать"),
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.green[600],
+                          elevation: 2.0,
+                          shadowColor: Colors.green[800],
+                        ),
                       ),
                     ),
                   ],

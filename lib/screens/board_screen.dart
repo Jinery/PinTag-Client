@@ -54,7 +54,7 @@ class _BoardsScreen extends State<BoardsScreen> {
         ],
       ),
       body: _isLoading ? Center(
-        child: CircularProgressIndicator(),
+        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.blue[700], strokeCap: StrokeCap.round),
       ) : _boards.isEmpty ? Center(
         child: Text("Доски отсутствуют"),
       ) : GridView.builder(
