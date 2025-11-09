@@ -25,6 +25,11 @@ class ApiService {
     return headers;
   }
 
+  String _getBodyError(String body) {
+    Map<String, dynamic> jsonBody = jsonDecode(body);
+    return jsonBody["detail"] ?? "Детали ошибки отсутствуют";
+  }
+
   Future<Map<String, dynamic>> generateConnect(int userId, String clientName) async {
     final response = await http.post(
       Uri.parse("$baseUrl/users/$userId/generate-connect"),
@@ -35,7 +40,7 @@ class ApiService {
     if(response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception("Не удалось установить подключение\nКод: ${response.statusCode}");
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
     }
   }
 
@@ -48,7 +53,53 @@ class ApiService {
     if(response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception("Не удалось получить статус подключения\nКод: ${response.statusCode}");
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
+    }
+  }
+
+  Future<Map<String, dynamic>> createBoard(int userId, String boardName, {String? boardEmoji}) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/users/$userId/boards"),
+      headers: await getHeaders(),
+      body: jsonEncode({
+        "board_name": boardName,
+        "board_emoji": boardEmoji ?? "📁"
+      }),
+    );
+
+    if(response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
+    }
+  }
+
+  Future<Map<String, dynamic>> renameBoard(int userId, int boardId, String newBoardName, {String? newBoardEmoji}) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/users/$userId/boards/$boardId").replace(queryParameters: {
+        "new_board_name": newBoardName,
+        "new_board_emoji": newBoardEmoji,
+      }),
+      headers: await getHeaders()
+    );
+
+    if(response.statusCode == 200 || response.statusCode == 206) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
+    }
+  }
+
+  Future<Map<String, dynamic>> removeBoard(int userId, int boardId) async {
+    final response = await http.delete(
+      Uri.parse("$baseUrl/users/$userId/boards/$boardId"),
+      headers: await getHeaders(),
+    );
+
+    if(response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
     }
   }
 
@@ -62,7 +113,7 @@ class ApiService {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Board.fromJson(json)).toList();
     } else {
-      throw Exception("Не удалось получить доски для текущего пользователя\nКод: ${response.statusCode}");
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
     }
   }
 
@@ -76,7 +127,7 @@ class ApiService {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Item.fromJson(json)).toList();
     } else {
-      throw Exception("Не удалось получить все элементы доски\nКод: ${response.statusCode}");
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
     }
   }
 
@@ -90,7 +141,7 @@ class ApiService {
       final List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Item.fromJson(json)).toList();
     } else {
-      throw Exception("Не удалось найти элементы по запросу $query\nКод: ${response.statusCode}");
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
     }
   }
 
@@ -104,7 +155,7 @@ class ApiService {
     if(response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception("Ошибка при создании элемента\nКод: ${response.statusCode}");
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
     }
   }
 
@@ -125,7 +176,7 @@ class ApiService {
     if(response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception("Ошибка при загрузке файла\nКод: ${response.statusCode}");
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
     }
   }
 
@@ -141,7 +192,7 @@ class ApiService {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception("Ошибка при перемещении элемента: ${response.statusCode}");
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
     }
   }
 
@@ -154,7 +205,7 @@ class ApiService {
     if(response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      throw Exception("Ошибка при удалении элемента\nКод: ${response.statusCode}");
+      throw Exception("Ошибка ${response.statusCode}\n${_getBodyError(response.body)}");
     }
   }
 }

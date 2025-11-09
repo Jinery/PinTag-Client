@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pin_tag_client/screens/items_screen.dart';
 import 'package:pin_tag_client/services/api_service.dart';
+import 'package:pin_tag_client/widgets/create_board_dialog.dart';
+import 'package:pin_tag_client/widgets/rename_board_dialog.dart';
 
 import '../models/board.dart';
 
@@ -41,6 +43,41 @@ class _BoardsScreen extends State<BoardsScreen> {
     }
   }
 
+  Future<void> _createBoard() async {
+    showDialog(
+        context: context, 
+        builder: (context) => CreateBoardDialog(
+            userId: widget.userId,
+            onBoardCreated: _loadBoards
+        ),
+    );
+  }
+
+  Future<void> _renameBoard(Board board) async {
+    showDialog(
+        context: context,
+        builder: (context) => RenameBoardDialog(
+            userId: widget.userId,
+            currentBoard: board,
+            onRename: _loadBoards
+        ),
+    );
+  }
+
+  Future<void> _removeBoard(int boardId) async {
+    try {
+      await _apiService.removeBoard(widget.userId, boardId);
+      await _loadBoards();
+    } on Exception catch (ex) {
+      if(mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(
+              ex.toString(), style: TextStyle(color: Colors.red[700]))),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,8 +85,8 @@ class _BoardsScreen extends State<BoardsScreen> {
         title: Text('Мои доски'),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () => Navigator.pushNamed(context, '/search'),
+            icon: Icon(Icons.add_box),
+            onPressed: () => _createBoard(),
           ),
         ],
       ),
@@ -87,6 +124,21 @@ class _BoardsScreen extends State<BoardsScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    const SizedBox(height: 5),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        IconButton(
+                            onPressed: () => _renameBoard(board),
+                            icon: Icon(Icons.update),
+                        ),
+                        const SizedBox(width: 2),
+                        IconButton(
+                            onPressed: () async => _removeBoard(board.id),
+                            icon: const Icon(Icons.delete, color: Colors.red,)
+                        ),
+                      ],
+                    ),
                     Text(board.emoji, style: TextStyle(fontSize: 32)),
                     const SizedBox(height: 8),
                     Text(

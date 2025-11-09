@@ -347,7 +347,7 @@ class _CreateItemDialog extends State<CreateItemDialog> {
                             ? SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.blue[700], strokeCap: StrokeCap.round),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white70, strokeCap: StrokeCap.round),
                         )
                             : const Text("Создать"),
                         style: FilledButton.styleFrom(

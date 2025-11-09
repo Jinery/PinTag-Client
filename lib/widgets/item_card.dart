@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path;
+import 'package:http/http.dart' as http;
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pin_tag_client/services/api_service.dart';
 import 'package:pin_tag_client/widgets/in_app_video_player.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../models/content_type.dart';
 import '../models/item.dart';
@@ -204,9 +209,13 @@ class ItemCard extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(
-            onPressed: () => launchUrl(Uri.parse(documentUrl)),
-            icon: Icon(Icons.open_in_new),
+          Builder(
+            builder: (innerContext) {
+              return IconButton(
+                onPressed: () => _downloadAndOpenFile(innerContext, item),
+                icon: Icon(Icons.open_in_new),
+              );
+            }
           ),
         ],
       ),
@@ -224,5 +233,45 @@ class ItemCard extends StatelessWidget {
       maxLines: 2,
       overflow: TextOverflow.ellipsis,
     );
+  }
+
+  Future<void> _downloadAndOpenFile(BuildContext context, Item item) async {
+    try {
+      if (item.filePath == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Файл не найден")),
+        );
+        return;
+      }
+      final fileUrl = '${ApiService.baseUrl}/files/${userId}/${item.filePath!}';
+
+      final dir = await getTemporaryDirectory();
+      final fileName = path.basename(item.filePath!);
+      final filePath = path.join(dir.path, fileName);
+
+      final response = await http.get(
+        Uri.parse(fileUrl),
+        headers: await ApiService.getHeaders(),
+      );
+
+      if (response.statusCode == 200) {
+        final file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+
+        final result = await OpenFilex.open(filePath);
+
+        if (result.type != ResultType.done) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Не удалось открыть файл")),
+          );
+        }
+      } else {
+        throw Exception("Ошибка загрузки: ${response.statusCode}");
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Ошибка: $e")),
+      );
+    }
   }
 }
